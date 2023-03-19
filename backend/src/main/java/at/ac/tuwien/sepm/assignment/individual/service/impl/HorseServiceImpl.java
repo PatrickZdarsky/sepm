@@ -89,8 +89,9 @@ public class HorseServiceImpl implements HorseService {
   }
 
   @Override
-  public HorseDetailDto create(HorseCreateDto toCreate) {
+  public HorseDetailDto create(HorseCreateDto toCreate) throws ValidationException {
     LOG.trace("create({})", toCreate);
+    validator.validateForCreate(toCreate);
 
     Horse horse = dao.create(toCreate);
 

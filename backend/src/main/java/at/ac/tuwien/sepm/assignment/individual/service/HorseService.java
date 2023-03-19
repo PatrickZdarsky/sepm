@@ -50,6 +50,7 @@ public interface HorseService {
    *
    * @param toCreate The new horse to create
    * @return The final state of the horse as saved in the persistent data store
+   * @throws ValidationException if the new data given for the horse is in itself incorrect (description too long, no name, …)
    */
-  HorseDetailDto create(HorseCreateDto toCreate);
+  HorseDetailDto create(HorseCreateDto toCreate) throws ValidationException;
 }
