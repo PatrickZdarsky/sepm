@@ -5,6 +5,7 @@ import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -27,6 +28,12 @@ public class HorseValidator {
       if (horse.description().length() > 4095) {
         validationErrors.add("Horse description too long: longer than 4095 characters");
       }
+    }
+
+    if (horse.dateOfBirth() == null) {
+      validationErrors.add("Date of birth is missing");
+    } else if (horse.dateOfBirth().isAfter(LocalDate.now())) {
+      validationErrors.add("Date of birth is in the future");
     }
 
     if (!validationErrors.isEmpty()) {

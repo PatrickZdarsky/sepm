@@ -8,6 +8,7 @@ import {Owner} from 'src/app/dto/owner';
 import {Sex} from 'src/app/dto/sex';
 import {HorseService} from 'src/app/service/horse.service';
 import {OwnerService} from 'src/app/service/owner.service';
+import {HttpErrorResponse} from '@angular/common/http';
 
 
 export enum HorseCreateEditMode {
@@ -23,10 +24,12 @@ export enum HorseCreateEditMode {
 export class HorseCreateEditComponent implements OnInit {
 
   mode: HorseCreateEditMode = HorseCreateEditMode.create;
+
   horse: Horse = {
     name: '',
     description: '',
-    dateOfBirth: new Date(),
+    // @ts-ignore
+    dateOfBirth: null,
     sex: Sex.female,
   };
 
@@ -118,9 +121,21 @@ export class HorseCreateEditComponent implements OnInit {
           this.notification.success(`Horse ${this.horse.name} successfully ${this.modeActionFinished}.`);
           this.router.navigate(['/horses']);
         },
-        error: error => {
-          console.error('Error creating horse', error);
-          // TODO show an error message to the user. Include and sensibly present the info from the backend!
+        error: (errorResponse: HttpErrorResponse) => {
+          let message = '';
+          switch (errorResponse.status) {
+            case 400:
+              message = `Invalid data for creating ${this.horse.name}: ${errorResponse.error.errors}`;
+              break;
+            case 500:
+              message = `Server error whilst creating ${this.horse.name}: ${errorResponse.error.errors}`;
+              break;
+            default:
+              message = `Error while creating ${this.horse.name}: ${errorResponse.error.errors}`;
+          }
+
+          this.notification.error(message);
+          console.error('Error creating horse', errorResponse);
         }
       });
     }
