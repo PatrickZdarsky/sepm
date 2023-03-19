@@ -47,6 +47,8 @@ export class HorseCreateEditComponent implements OnInit {
     switch (this.mode) {
       case HorseCreateEditMode.create:
         return 'Create New Horse';
+      case HorseCreateEditMode.edit:
+        return 'Update Horse';
       default:
         return '?';
     }
@@ -56,6 +58,8 @@ export class HorseCreateEditComponent implements OnInit {
     switch (this.mode) {
       case HorseCreateEditMode.create:
         return 'Create';
+      case HorseCreateEditMode.edit:
+        return 'Update';
       default:
         return '?';
     }
@@ -70,6 +74,8 @@ export class HorseCreateEditComponent implements OnInit {
     switch (this.mode) {
       case HorseCreateEditMode.create:
         return 'created';
+      case HorseCreateEditMode.edit:
+        return 'updated';
       default:
         return '?';
     }
@@ -82,6 +88,29 @@ export class HorseCreateEditComponent implements OnInit {
   ngOnInit(): void {
     this.route.data.subscribe(data => {
       this.mode = data.mode;
+
+      if (this.mode === HorseCreateEditMode.edit) {
+        const id = Number(this.route.snapshot.paramMap.get('id'));
+
+        if (Number.isNaN(id)) {
+          this.notification.error(`Invalid horse id given`);
+          this.router.navigate(['/horses']);
+          console.error('Error invalid horse id', this.route.snapshot.paramMap.get('id'));
+          return;
+        }
+
+        this.service.get(id).subscribe({
+          next: horse => {
+            this.horse = horse;
+          },
+          error: (errorResponse: HttpErrorResponse) => {
+            this.notification.error(`Could not find horse to edit`);
+            this.router.navigate(['/horses']);
+            console.error('Error no horse found with id', this.route.snapshot.paramMap.get('id'));
+            return;
+          }
+        });
+      }
     });
   }
 
@@ -111,6 +140,9 @@ export class HorseCreateEditComponent implements OnInit {
       switch (this.mode) {
         case HorseCreateEditMode.create:
           observable = this.service.create(this.horse);
+          break;
+        case HorseCreateEditMode.edit:
+          observable = this.service.update(this.horse);
           break;
         default:
           console.error('Unknown HorseCreateEditMode', this.mode);
