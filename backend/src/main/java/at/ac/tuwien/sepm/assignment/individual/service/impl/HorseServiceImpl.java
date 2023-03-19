@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.assignment.individual.service.impl;
 
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
@@ -22,6 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * The implementation of the horse service to manage horses
+ */
 @Service
 public class HorseServiceImpl implements HorseService {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -30,6 +34,14 @@ public class HorseServiceImpl implements HorseService {
   private final HorseValidator validator;
   private final OwnerService ownerService;
 
+  /**
+   * Default DI constructor.
+   *
+   * @param dao The DAO to manipulate saved horses
+   * @param mapper The mapper to convert between DTO's and entities
+   * @param validator The validator to validate entities
+   * @param ownerService The owner service to look up owner references from horses
+   */
   public HorseServiceImpl(HorseDao dao, HorseMapper mapper, HorseValidator validator, OwnerService ownerService) {
     this.dao = dao;
     this.mapper = mapper;
@@ -74,6 +86,16 @@ public class HorseServiceImpl implements HorseService {
     return mapper.entityToDetailDto(
         horse,
         ownerMapForSingleId(horse.getOwnerId()));
+  }
+
+  @Override
+  public HorseDetailDto create(HorseCreateDto toCreate) {
+    LOG.trace("create({})", toCreate);
+
+    Horse horse = dao.create(toCreate);
+
+    return mapper.entityToDetailDto(horse,
+            ownerMapForSingleId(horse.getOwnerId()));
   }
 
 
