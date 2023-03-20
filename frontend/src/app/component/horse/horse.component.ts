@@ -3,6 +3,7 @@ import {ToastrService} from 'ngx-toastr';
 import {HorseService} from 'src/app/service/horse.service';
 import {Horse} from '../../dto/horse';
 import {Owner} from '../../dto/owner';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-horse',
@@ -50,4 +51,15 @@ export class HorseComponent implements OnInit {
     return new Date(horse.dateOfBirth).toLocaleDateString();
   }
 
+  delete(id: number): void {
+    this.service.delete(id).subscribe({
+      next: () => {
+        this.reloadHorses();
+        this.notification.info('Horse deleted successfully.');
+      },
+      error: (errorResponse: HttpErrorResponse) => {
+        this.notification.error(`Could not delete horse: ${errorResponse.error.errors}`);
+      }
+    });
+  }
 }

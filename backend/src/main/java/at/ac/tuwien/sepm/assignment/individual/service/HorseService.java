@@ -53,4 +53,12 @@ public interface HorseService {
    * @throws ValidationException if the new data given for the horse is in itself incorrect (description too long, no name, …)
    */
   HorseDetailDto create(HorseCreateDto toCreate) throws ValidationException;
+
+  /**
+   * Delete a single horse
+   *
+   * @param id The id of the horse to delete
+   * @throws NotFoundException If no horse with the given id was found
+   */
+  void delete(long id) throws NotFoundException;
 }

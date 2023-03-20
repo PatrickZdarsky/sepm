@@ -129,6 +129,20 @@ export class HorseCreateEditComponent implements OnInit {
       : `${owner.firstName} ${owner.lastName}`;
   }
 
+  public onDelete(): void {
+    if (!this.modeIsCreate && this.horse.id != null) {
+      this.service.delete(this.horse.id).subscribe({
+        next: () => {
+          this.notification.success(`Horse ${this.horse.name} successfully deleted.`);
+          this.router.navigate(['/horses']);
+        },
+        error: (errorResponse: HttpErrorResponse) => {
+          this.notification.error(`Could not delete horse: ${errorResponse.error.errors}`);
+          console.error('Error deleting horse', errorResponse.error.errors);
+        }
+      });
+    }
+  }
 
   public onSubmit(form: NgForm): void {
     console.log('is form valid?', form.valid, this.horse);
