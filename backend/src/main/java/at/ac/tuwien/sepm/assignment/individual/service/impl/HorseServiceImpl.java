@@ -15,6 +15,7 @@ import at.ac.tuwien.sepm.assignment.individual.service.HorseService;
 import at.ac.tuwien.sepm.assignment.individual.service.OwnerService;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -71,32 +72,60 @@ public class HorseServiceImpl implements HorseService {
   @Override
   public HorseDetailDto update(HorseDetailDto horse) throws NotFoundException, ValidationException, ConflictException {
     LOG.trace("update({})", horse);
-    validator.validateForUpdate(horse);
+
+    var simpleHorse = horse.withoutParents();
+    var father = horse.father() == null ? null : dao.getById(horse.father().id());
+    var mother = horse.mother() == null ? null : dao.getById(horse.mother().id());
+
+    var owners = ownerMap(horse.ownerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId());
+    var fatherDto = father == null ? null : mapper.entityToDetailDto(father, owners);
+    var motherDto = mother == null ? null : mapper.entityToDetailDto(mother, owners);
+
+    validator.validateForUpdate(horse, fatherDto, motherDto);
     var updatedHorse = dao.update(horse);
+
+
+
     return mapper.entityToDetailDto(
-        updatedHorse,
-        ownerMapForSingleId(updatedHorse.getOwnerId()));
+        updatedHorse, fatherDto, motherDto,
+        owners);
   }
 
 
   @Override
   public HorseDetailDto getById(long id) throws NotFoundException {
     LOG.trace("getById({})", id);
-    Horse horse = dao.getById(id);
+
+    var horse = dao.getById(id);
+    var father = horse.getFatherId() == null ? null : dao.getById(horse.getFatherId());
+    var mother = horse.getMotherId() == null ? null : dao.getById(horse.getMotherId());
+
+    var owners = ownerMap(horse.getOwnerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId());
     return mapper.entityToDetailDto(
-        horse,
-        ownerMapForSingleId(horse.getOwnerId()));
+            horse,
+            mapper.entityToDetailDto(father, owners),
+            mapper.entityToDetailDto(mother, owners),
+            owners);
   }
 
   @Override
-  public HorseDetailDto create(HorseCreateDto toCreate) throws ValidationException {
+  public HorseDetailDto create(HorseCreateDto toCreate) throws ValidationException, ConflictException, NotFoundException {
     LOG.trace("create({})", toCreate);
-    validator.validateForCreate(toCreate);
 
+    var father = toCreate.fatherId() == null ? null : dao.getById(toCreate.fatherId());
+    var mother = toCreate.motherId() == null ? null : dao.getById(toCreate.motherId());
+    var owners = ownerMap(toCreate.ownerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId());
+    var fatherDto = father == null ? null : mapper.entityToDetailDto(father, ownerMapForSingleId(father.getOwnerId()));
+    var motherDto = mother == null ? null : mapper.entityToDetailDto(mother, ownerMapForSingleId(mother.getOwnerId()));
+
+    validator.validateForCreate(toCreate, fatherDto, motherDto);
     Horse horse = dao.create(toCreate);
 
-    return mapper.entityToDetailDto(horse,
-            ownerMapForSingleId(horse.getOwnerId()));
+    return mapper.entityToDetailDto(
+            horse,
+            mapper.entityToDetailDto(father, owners),
+            mapper.entityToDetailDto(mother, owners),
+            owners);
   }
 
   @Override
@@ -110,11 +139,29 @@ public class HorseServiceImpl implements HorseService {
   private Map<Long, OwnerDto> ownerMapForSingleId(Long ownerId) {
     try {
       return ownerId == null
-          ? null
-          : Collections.singletonMap(ownerId, ownerService.getById(ownerId));
+              ? null
+              : Collections.singletonMap(ownerId, ownerService.getById(ownerId));
     } catch (NotFoundException e) {
       throw new FatalException("Owner %d referenced by horse not found".formatted(ownerId));
     }
   }
 
+  private Map<Long, OwnerDto> ownerMap(Long... ownerIds) {
+    if (ownerIds == null) {
+      return null;
+    }
+
+    var map = new HashMap<Long, OwnerDto>();
+    for (var ownerId : ownerIds) {
+      if (ownerId != null) {
+        try {
+          map.put(ownerId, ownerService.getById(ownerId));
+        } catch (NotFoundException e) {
+          throw new FatalException("Owner %d referenced by horse not found".formatted(ownerId));
+        }
+      }
+    }
+
+    return map;
+  }
 }

@@ -94,7 +94,7 @@ public class HorseEndpoint {
    * @throws ValidationException If validation errors occur
    */
   @PostMapping()
-  public HorseDetailDto create(@RequestBody HorseCreateDto toCreate) throws ValidationException {
+  public HorseDetailDto create(@RequestBody HorseCreateDto toCreate) throws ValidationException, ConflictException, NotFoundException {
     LOG.info("POST " + BASE_PATH + "/");
     LOG.debug("Body of request:\n{}", toCreate);
 

@@ -9,7 +9,9 @@ public record HorseDetailDto(
     String description,
     LocalDate dateOfBirth,
     Sex sex,
-    OwnerDto owner
+    OwnerDto owner,
+    HorseDetailSimpleDto father,
+    HorseDetailSimpleDto mother
 ) {
   public HorseDetailDto withId(long newId) {
     return new HorseDetailDto(
@@ -18,7 +20,21 @@ public record HorseDetailDto(
         description,
         dateOfBirth,
         sex,
-        owner);
+        owner,
+        father,
+        mother);
+  }
+
+  public HorseDetailDto withoutParents() {
+    return new HorseDetailDto(
+            id,
+            name,
+            description,
+            dateOfBirth,
+            sex,
+            owner,
+            null,
+            null);
   }
 
   public Long ownerId() {
@@ -27,4 +43,15 @@ public record HorseDetailDto(
         : owner.id();
   }
 
+  public Long fatherId() {
+    return father == null
+            ? null
+            : father.id();
+  }
+
+  public Long motherId() {
+    return mother == null
+            ? null
+            : mother.id();
+  }
 }

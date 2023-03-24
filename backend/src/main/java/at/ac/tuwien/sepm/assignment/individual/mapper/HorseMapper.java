@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.assignment.individual.mapper;
 
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailSimpleDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
@@ -43,29 +44,59 @@ public class HorseMapper {
   }
 
   /**
-   * Convert a horse entity object to a {@link HorseDetailDto}.
+   * Convert a horse entity object to a {@link HorseDetailSimpleDto}.
    * The given map of owners needs to contain the owner of {@code horse}.
    *
    * @param horse the horse to convert
    * @param owners a map of horse owners by their id, which needs to contain the owner referenced by {@code horse}
-   * @return the converted {@link HorseDetailDto}
+   * @return the converted {@link HorseDetailSimpleDto}
    */
-  public HorseDetailDto entityToDetailDto(
-      Horse horse,
-      Map<Long, OwnerDto> owners) {
+  public HorseDetailSimpleDto entityToDetailDto(
+          Horse horse,
+          Map<Long, OwnerDto> owners) {
     LOG.trace("entityToDto({})", horse);
     if (horse == null) {
       return null;
     }
 
 
+    return new HorseDetailSimpleDto(
+            horse.getId(),
+            horse.getName(),
+            horse.getDescription(),
+            horse.getDateOfBirth(),
+            horse.getSex(),
+            getOwner(horse, owners)
+    );
+  }
+
+  /**
+   * Convert a horse entity object to a {@link HorseDetailDto}.
+   * The given map of owners needs to contain the owner of {@code horse}.
+   *
+   * @param horse the horse to convert
+   * @param father The father of the horse, or null
+   * @param mother The mother of the horse, or null
+   * @param owners a map of horse owners by their id, which needs to contain the owner referenced by {@code horse}
+   * @return the converted {@link HorseDetailDto}
+   */
+  public HorseDetailDto entityToDetailDto(
+          Horse horse, HorseDetailSimpleDto father, HorseDetailSimpleDto mother,
+          Map<Long, OwnerDto> owners) {
+    LOG.trace("entityToDto({})", horse);
+    if (horse == null) {
+      return null;
+    }
+
     return new HorseDetailDto(
-        horse.getId(),
-        horse.getName(),
-        horse.getDescription(),
-        horse.getDateOfBirth(),
-        horse.getSex(),
-        getOwner(horse, owners)
+            horse.getId(),
+            horse.getName(),
+            horse.getDescription(),
+            horse.getDateOfBirth(),
+            horse.getSex(),
+            getOwner(horse, owners),
+            father,
+            mother
     );
   }
 

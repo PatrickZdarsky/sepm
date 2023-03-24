@@ -14,6 +14,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 export enum HorseCreateEditMode {
   create,
   edit,
+  view
 };
 
 @Component({
@@ -23,6 +24,7 @@ export enum HorseCreateEditMode {
 })
 export class HorseCreateEditComponent implements OnInit {
 
+  public readonly modes = HorseCreateEditMode;
   mode: HorseCreateEditMode = HorseCreateEditMode.create;
 
   horse: Horse = {
@@ -85,6 +87,12 @@ export class HorseCreateEditComponent implements OnInit {
     ? of([])
     : this.ownerService.searchByName(input, 5);
 
+  fatherSuggestions = (input: string) =>
+    input === '' ? of([]) : this.service.search({ name: input, sex: Sex.male });
+
+  motherSuggestions = (input: string) =>
+    input === '' ? of([]) : this.service.search({ name: input, sex: Sex.female });
+
   ngOnInit(): void {
     this.route.data.subscribe(data => {
       this.mode = data.mode;
@@ -127,6 +135,10 @@ export class HorseCreateEditComponent implements OnInit {
     return (owner == null)
       ? ''
       : `${owner.firstName} ${owner.lastName}`;
+  }
+
+  public formatHorseName(horse: Horse | null | undefined): string {
+    return horse == null ? '' : horse.name;
   }
 
   public onDelete(): void {

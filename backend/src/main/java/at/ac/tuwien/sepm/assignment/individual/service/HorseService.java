@@ -52,7 +52,7 @@ public interface HorseService {
    * @return The final state of the horse as saved in the persistent data store
    * @throws ValidationException if the new data given for the horse is in itself incorrect (description too long, no name, …)
    */
-  HorseDetailDto create(HorseCreateDto toCreate) throws ValidationException;
+  HorseDetailDto create(HorseCreateDto toCreate) throws ValidationException, ConflictException, NotFoundException;
 
   /**
    * Delete a single horse
