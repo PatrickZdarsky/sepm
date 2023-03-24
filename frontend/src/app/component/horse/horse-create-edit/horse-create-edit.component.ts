@@ -53,9 +53,9 @@ export class HorseCreateEditComponent implements OnInit {
       case HorseCreateEditMode.create:
         return 'Create New Horse';
       case HorseCreateEditMode.edit:
-        return 'Update Horse';
+        return 'Edit Horse';
       case HorseCreateEditMode.view:
-        return 'Horse Info';
+        return 'Details of Horse';
       default:
         return '?';
     }
