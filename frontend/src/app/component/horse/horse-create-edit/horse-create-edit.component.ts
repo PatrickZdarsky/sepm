@@ -43,6 +43,9 @@ export class HorseCreateEditComponent implements OnInit {
     private route: ActivatedRoute,
     private notification: ToastrService,
   ) {
+    this.route.paramMap.subscribe(() => {
+      this.ngOnInit();
+    });
   }
 
   public get heading(): string {
@@ -51,6 +54,8 @@ export class HorseCreateEditComponent implements OnInit {
         return 'Create New Horse';
       case HorseCreateEditMode.edit:
         return 'Update Horse';
+      case HorseCreateEditMode.view:
+        return 'Horse Info';
       default:
         return '?';
     }
@@ -62,6 +67,8 @@ export class HorseCreateEditComponent implements OnInit {
         return 'Create';
       case HorseCreateEditMode.edit:
         return 'Update';
+      case HorseCreateEditMode.view:
+        return 'Edit';
       default:
         return '?';
     }
@@ -69,6 +76,10 @@ export class HorseCreateEditComponent implements OnInit {
 
   get modeIsCreate(): boolean {
     return this.mode === HorseCreateEditMode.create;
+  }
+
+  get modeIsView(): boolean {
+    return this.mode === HorseCreateEditMode.view;
   }
 
 
@@ -97,7 +108,7 @@ export class HorseCreateEditComponent implements OnInit {
     this.route.data.subscribe(data => {
       this.mode = data.mode;
 
-      if (this.mode === HorseCreateEditMode.edit) {
+      if (this.mode === HorseCreateEditMode.edit || this.mode === HorseCreateEditMode.view) {
         const id = Number(this.route.snapshot.paramMap.get('id'));
 
         if (Number.isNaN(id)) {
@@ -112,7 +123,7 @@ export class HorseCreateEditComponent implements OnInit {
             this.horse = horse;
           },
           error: (errorResponse: HttpErrorResponse) => {
-            this.notification.error(`Could not find horse to edit`);
+            this.notification.error(`Could not find horse`);
             this.router.navigate(['/horses']);
             console.error('Error no horse found with id', this.route.snapshot.paramMap.get('id'));
             return;
@@ -157,6 +168,11 @@ export class HorseCreateEditComponent implements OnInit {
   }
 
   public onSubmit(form: NgForm): void {
+    if (this.modeIsView) {
+      this.router.navigate(['/horses/edit', this.horse.id]);
+      return;
+    }
+
     console.log('is form valid?', form.valid, this.horse);
     if (form.valid) {
       if (this.horse.description === '') {

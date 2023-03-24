@@ -11,22 +11,26 @@
         <label for="horseName" class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
           Name
         </label>
-        <div class="col-md-10 col-lg-8"
-             >
-          <input type="text"
-                 id="horseName"
-                 name="horseName"
-                 placeholder="Horse name"
-                 class="form-control"
-                 [class]="dynamicCssClassesForInput(horseNameModel)"
-                 [(ngModel)]="horse.name"
-                 #horseNameModel="ngModel"
-                 required
-                 >
-          <div class="invalid-feedback">
-            <!-- This is shown, when the form validation deems the name input to be invalid -->
-            Name is required
-          </div>
+        <div class="col-md-10 col-lg-8" [ngSwitch]="mode">
+          <ng-container *ngSwitchCase="modes.view">
+            <div class="col-form-label">{{ horse.name }}</div>
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            <input type="text"
+                   id="horseName"
+                   name="horseName"
+                   placeholder="Horse name"
+                   class="form-control"
+                   [class]="dynamicCssClassesForInput(horseNameModel)"
+                   [(ngModel)]="horse.name"
+                   #horseNameModel="ngModel"
+                   required
+            >
+            <div class="invalid-feedback">
+              <!-- This is shown, when the form validation deems the name input to be invalid -->
+              Name is required
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -35,20 +39,26 @@
         <label for="horseDateOfBirth" class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
           Date of Birth
         </label>
-        <div class="col-md-10 col-lg-8"
-             >
-          <input type="date"
-                 id="horseDateOfBirth"
-                 name="horseDateOfBirth"
-                 class="form-control"
-                 [class]="dynamicCssClassesForInput(horseDateOfBirthModel)"
-                 [(ngModel)]="horse.dateOfBirth"
-                 #horseDateOfBirthModel="ngModel"
-                 required
-                 >
-          <div class="invalid-feedback">
-            Date of birth is required
-          </div>
+        <div class="col-md-10 col-lg-8" [ngSwitch]="mode">
+          <ng-container *ngSwitchCase="modes.view">
+            <div class="col-form-label">
+              {{ horse.dateOfBirth | date : 'longDate' }}
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            <input type="date"
+                   id="horseDateOfBirth"
+                   name="horseDateOfBirth"
+                   class="form-control"
+                   [class]="dynamicCssClassesForInput(horseDateOfBirthModel)"
+                   [(ngModel)]="horse.dateOfBirth"
+                   #horseDateOfBirthModel="ngModel"
+                   required
+            >
+            <div class="invalid-feedback">
+              Date of birth is required
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -62,17 +72,20 @@
         <label for="horseSex" class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
           Sex
         </label>
-        <div class="col-md-10 col-lg-8"
-             >
-          <select class="form-select"
-                  id="horseSex"
-                  name="horseSex"
-                  [(ngModel)]="horse.sex"
-                  required
-                  >
-            <option value="FEMALE">Female</option>
-            <option value="MALE">Male</option>
-          </select>
+        <div class="col-md-10 col-lg-8" [ngSwitch]="mode">
+          <ng-container *ngSwitchCase="modes.view">
+            <div class="col-form-label">{{ horse.sex | titlecase }}</div>
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            <select class="form-select"
+                    id="horseSex"
+                    name="horseSex"
+                    [(ngModel)]="horse.sex"
+                    required>
+              <option value="FEMALE">Female</option>
+              <option value="MALE">Male</option>
+            </select>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -82,16 +95,35 @@
         <label for="horseOwner" class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
           Owner
         </label>
-        <app-autocomplete
-          id="horseOwner"
-          name="horseOwner"
-          class="col-md-10 col-lg-8"
-          textInputClass="form-control"
-          valueNeedsToMatchSuggestion="true"
-          [(ngModel)]="horse.owner"
-          [formatModel]="formatOwnerName"
-          [suggestions]="ownerSuggestions"
-          ></app-autocomplete>
+        <div class="col-md-10 col-lg-8" [ngSwitch]="mode">
+          <ng-container *ngSwitchCase="modes.view">
+            <div class="col-form-label">
+              {{ horse.owner?.firstName }} {{ horse.owner?.lastName }}
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            <app-autocomplete
+              id="horseOwner"
+              name="horseOwner"
+              class="col-md-10 col-lg-8"
+              textInputClass="form-control"
+              valueNeedsToMatchSuggestion="true"
+              [(ngModel)]="horse.owner"
+              [formatModel]="formatOwnerName"
+              [suggestions]="ownerSuggestions"
+            ></app-autocomplete>
+          </ng-container>
+        </div>
+<!--        <app-autocomplete-->
+<!--          id="horseOwner"-->
+<!--          name="horseOwner"-->
+<!--          class="col-md-10 col-lg-8"-->
+<!--          textInputClass="form-control"-->
+<!--          valueNeedsToMatchSuggestion="true"-->
+<!--          [(ngModel)]="horse.owner"-->
+<!--          [formatModel]="formatOwnerName"-->
+<!--          [suggestions]="ownerSuggestions"-->
+<!--          ></app-autocomplete>-->
       </div>
     </div>
     <!-- End sex and owner row -->
@@ -112,8 +144,7 @@
             <a
               [routerLink]="['../' + horse.mother?.id]"
               class="col-form-label text-decoration-none d-block"
-            >{{ horse.mother?.name }}</a
-            >
+            >{{ horse.mother?.name }}</a>
           </ng-container>
           <ng-container *ngSwitchDefault>
             <app-autocomplete
@@ -144,8 +175,7 @@
             <a
               [routerLink]="['../' + horse.father?.id]"
               class="col-form-label text-decoration-none d-block"
-            >{{ horse.father?.name }}</a
-            >
+            >{{ horse.father?.name }}</a>
           </ng-container>
           <ng-container *ngSwitchDefault>
             <app-autocomplete
@@ -171,14 +201,17 @@
     <label for="horseDescription" class="col-form-label text-md-end text-md-end text-muted col-md-2">
       Description
     </label>
-    <div class="col-md-10"
-         >
-      <textarea class="form-control"
-                id="horseDescription"
-                name="horseDescription"
-                [(ngModel)]="horse.description"
-                >
+    <div class="col-md-10" [ngSwitch]="mode">
+      <ng-container *ngSwitchCase="modes.view">
+        <div class="col-form-label">{{ horse.description }}</div>
+      </ng-container>
+      <ng-container *ngSwitchDefault>
+        <textarea class="form-control"
+                  id="horseDescription"
+                  name="horseDescription"
+                  [(ngModel)]="horse.description">
       </textarea>
+      </ng-container>
     </div>
   </div>
 
@@ -187,7 +220,7 @@
             class="btn btn-danger"
             *ngIf="!modeIsCreate"
             (click)="onDelete()"
-            >
+    >
       <i class="bi bi-trash"></i>
       Delete
     </button>
