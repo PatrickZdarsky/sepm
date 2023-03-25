@@ -19,4 +19,5 @@ export interface HorseSearch {
   bornBefore?: string;
   sex?: Sex;
   ownerName?: string;
+  limit?: number;
 }

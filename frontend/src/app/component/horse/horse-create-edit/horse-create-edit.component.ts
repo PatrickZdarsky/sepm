@@ -99,10 +99,10 @@ export class HorseCreateEditComponent implements OnInit {
     : this.ownerService.searchByName(input, 5);
 
   fatherSuggestions = (input: string) =>
-    input === '' ? of([]) : this.service.search({ name: input, sex: Sex.male });
+    input === '' ? of([]) : this.service.search({ name: input, sex: Sex.male, limit: 5 });
 
   motherSuggestions = (input: string) =>
-    input === '' ? of([]) : this.service.search({ name: input, sex: Sex.female });
+    input === '' ? of([]) : this.service.search({ name: input, sex: Sex.female, limit: 5 });
 
   ngOnInit(): void {
     this.route.data.subscribe(data => {
