@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.assignment.individual.service;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
@@ -61,4 +62,12 @@ public interface HorseService {
    * @throws NotFoundException If no horse with the given id was found
    */
   void delete(long id) throws NotFoundException;
+
+  /**
+   * Search for horses based on search parameters which are connected using AND Operations
+   *
+   * @param searchParameters The parameters, that the returned horses must match
+   * @return All horses which match the search parameters
+   */
+  Stream<HorseListDto> search(HorseSearchDto searchParameters);
 }

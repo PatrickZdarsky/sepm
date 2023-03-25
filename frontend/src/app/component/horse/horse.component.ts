@@ -1,22 +1,30 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ToastrService} from 'ngx-toastr';
+import {debounceTime, map, of, Subscription} from 'rxjs';
 import {HorseService} from 'src/app/service/horse.service';
-import {Horse} from '../../dto/horse';
-import {Owner} from '../../dto/owner';
+import {OwnerService} from 'src/app/service/owner.service';
+import {Horse, HorseSearch} from 'src/app/dto/horse';
+import {Owner} from 'src/app/dto/owner';
 import {HttpErrorResponse} from '@angular/common/http';
+import {NgForm} from '@angular/forms';
+
 
 @Component({
   selector: 'app-horse',
   templateUrl: './horse.component.html',
   styleUrls: ['./horse.component.scss']
 })
-export class HorseComponent implements OnInit {
-  search = false;
+export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('form', { static: true }) ngForm?: NgForm;
+
   horses: Horse[] = [];
   bannerError: string | null = null;
+  searchData: HorseSearch = {};
+  searchUpdate?: Subscription;
 
   constructor(
-    private service: HorseService,
+    private horseService: HorseService,
+    private ownerService: OwnerService,
     private notification: ToastrService,
   ) { }
 
@@ -24,8 +32,18 @@ export class HorseComponent implements OnInit {
     this.reloadHorses();
   }
 
+  ngAfterViewInit(): void {
+    this.searchUpdate = this.ngForm?.valueChanges
+      ?.pipe(debounceTime(250))
+      .subscribe(this.reloadHorses.bind(this));
+  }
+
+  ngOnDestroy(): void {
+    this.searchUpdate?.unsubscribe();
+  }
+
   reloadHorses() {
-    this.service.getAll()
+    this.horseService.search(this.searchData)
       .subscribe({
         next: data => {
           this.horses = data;
@@ -51,8 +69,21 @@ export class HorseComponent implements OnInit {
     return new Date(horse.dateOfBirth).toLocaleDateString();
   }
 
+  public formatAutocompleteInput(owner: string | null | undefined): string {
+    return owner == null ? '' : owner;
+  }
+
+  ownerSuggestions = (input: string) =>
+    input === ''
+      ? of([])
+      : this.ownerService.searchByName(input, 5)
+        .pipe(
+          map(owners =>
+            owners.map(o => [o.firstName, o.lastName].filter(s => s.length > 0).join(' '))
+          ));
+
   delete(id: number): void {
-    this.service.delete(id).subscribe({
+    this.horseService.delete(id).subscribe({
       next: () => {
         this.reloadHorses();
         this.notification.info('Horse deleted successfully.');

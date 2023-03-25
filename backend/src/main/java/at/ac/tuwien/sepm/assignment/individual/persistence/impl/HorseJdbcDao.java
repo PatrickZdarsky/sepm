@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.assignment.individual.persistence.impl;
 
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
@@ -14,9 +15,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.function.Function;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
@@ -45,6 +50,8 @@ public class HorseJdbcDao implements HorseDao {
 
   private static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME
           + " WHERE id=?";
+
+  private static final String SQL_SEARCH = "SELECT * FROM " + TABLE_NAME + " WHERE 1=1";
 
   private final JdbcTemplate jdbcTemplate;
 
@@ -122,6 +129,43 @@ public class HorseJdbcDao implements HorseDao {
       // This should never happen. If it does, something is wrong with the DB or the way the prepared statement is set up.
       throw new FatalException("Deleted more than one entry in the database");
     }
+  }
+
+  @Override
+  public List<Horse> search(HorseSearchDto searchFilter) {
+    LOG.trace("search({})", searchFilter);
+
+    Function<String, String> like = str -> "%" + str.toLowerCase() + "%";
+
+    var sqlParams = new MapSqlParameterSource();
+    String sql = SQL_SEARCH;
+
+    if (searchFilter.name() != null && searchFilter.name() != "") {
+      sql += " AND LOWER(name) LIKE :name";
+      sqlParams.addValue("name", like.apply(searchFilter.name()));
+    }
+    if (searchFilter.description() != null && searchFilter.description() != "") {
+      sql += " AND LOWER(description) LIKE :description";
+      sqlParams.addValue("description", like.apply(searchFilter.description()));
+    }
+    if (searchFilter.sex() != null) {
+      sql += " AND sex = :sex";
+      sqlParams.addValue("sex", searchFilter.sex().name());
+    }
+    if (searchFilter.bornBefore() != null) {
+      sql += " AND date_of_birth < :birth";
+      sqlParams.addValue("birth", Date.valueOf(searchFilter.bornBefore()));
+    }
+    if (searchFilter.ownerName() != null && searchFilter.ownerName() != "") {
+      sql += " AND owner_id IN (SELECT id FROM owner WHERE LOWER(first_name) LIKE :owner OR LOWER(last_name) LIKE :owner)";
+      sqlParams.addValue("owner", like.apply(searchFilter.ownerName()));
+    }
+    if (searchFilter.limit() != null) {
+      sql += " LIMIT :limit";
+      sqlParams.addValue("limit", searchFilter.limit());
+    }
+
+    return new NamedParameterJdbcTemplate(jdbcTemplate).query(sql, sqlParams, this::mapRow);
   }
 
 

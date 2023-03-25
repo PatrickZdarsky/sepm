@@ -41,8 +41,8 @@ public class HorseEndpoint {
   public Stream<HorseListDto> searchHorses(HorseSearchDto searchParameters) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("request parameters: {}", searchParameters);
-    // TODO We have the request params in the DTO now, but don't do anything with them yet…
-    return service.allHorses();
+
+    return service.search(searchParameters);
   }
 
   /**

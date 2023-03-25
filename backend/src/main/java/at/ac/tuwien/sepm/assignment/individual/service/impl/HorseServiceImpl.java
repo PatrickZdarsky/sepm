@@ -1,9 +1,6 @@
 package at.ac.tuwien.sepm.assignment.individual.service.impl;
 
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.*;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.FatalException;
@@ -133,6 +130,11 @@ public class HorseServiceImpl implements HorseService {
     LOG.trace("delete({})", id);
 
     dao.delete(id);
+  }
+
+  @Override
+  public Stream<HorseListDto> search(HorseSearchDto searchParameters) {
+    return dao.search(searchParameters).stream().map(horse -> mapper.entityToListDto(horse, ownerMapForSingleId(horse.getOwnerId())));
   }
 
 
