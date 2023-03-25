@@ -27,6 +27,7 @@ public class OwnerJdbcDao implements OwnerDao {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static final String TABLE_NAME = "owner";
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+  private static final String SQL_SELECT_BY_EMAIL = "SELECT * FROM " + TABLE_NAME + " WHERE email = ?";
   private static final String SQL_SELECT_ALL = "SELECT * FROM " + TABLE_NAME + " WHERE id IN (:ids)";
   private static final String SQL_SELECT_SEARCH = "SELECT * FROM " + TABLE_NAME
       + " WHERE UPPER(first_name||' '||last_name) like UPPER('%'||COALESCE(?, '')||'%')";
@@ -81,6 +82,20 @@ public class OwnerJdbcDao implements OwnerDao {
         .setLastName(newOwner.lastName())
         .setEmail(newOwner.email())
         ;
+  }
+
+  @Override
+  public boolean emailExists(String email) {
+    LOG.trace("getByEmail({})", email);
+    List<Owner> owners = jdbcTemplate.query(SQL_SELECT_BY_EMAIL, this::mapRow, email);
+    if (owners.isEmpty()) {
+      return false;
+    }
+    if (owners.size() > 1) {
+      // If this happens, something is wrong with either the DB or the select
+      throw new FatalException("Found more than one owner with email %s".formatted(email));
+    }
+    return true;
   }
 
   @Override

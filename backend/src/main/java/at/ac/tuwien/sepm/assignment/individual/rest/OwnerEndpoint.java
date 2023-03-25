@@ -1,15 +1,16 @@
 package at.ac.tuwien.sepm.assignment.individual.rest;
 
+import at.ac.tuwien.sepm.assignment.individual.dto.OwnerCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerSearchDto;
+import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
+import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepm.assignment.individual.service.OwnerService;
 import java.lang.invoke.MethodHandles;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(OwnerEndpoint.BASE_PATH)
@@ -27,6 +28,14 @@ public class OwnerEndpoint {
   public Stream<OwnerDto> search(OwnerSearchDto searchParameters) {
     LOG.info("GET " + BASE_PATH + " query parameters: {}", searchParameters);
     return service.search(searchParameters);
+  }
+
+  @PostMapping
+  public OwnerDto create(@RequestBody OwnerCreateDto owner) throws ValidationException, ConflictException {
+    LOG.info("POST " + BASE_PATH + "/");
+    LOG.debug("Body of request:\n{}", owner);
+
+    return service.create(owner);
   }
 
 }

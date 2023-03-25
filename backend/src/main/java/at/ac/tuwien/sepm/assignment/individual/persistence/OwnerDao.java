@@ -49,4 +49,12 @@ public interface OwnerDao {
    * @return the newly created owner
    */
   Owner create(OwnerCreateDto newOwner);
+
+  /**
+   * Check if an email is already set by an owner.
+   *
+   * @param email The mail to check if is already in the persistent data store
+   * @return true, if the email is already in the persistent data store, false otherwise
+   */
+  boolean emailExists(String email);
 }
