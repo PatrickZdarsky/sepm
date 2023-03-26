@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,6 +32,7 @@ public class OwnerEndpoint {
   }
 
   @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
   public OwnerDto create(@RequestBody OwnerCreateDto owner) throws ValidationException, ConflictException {
     LOG.info("POST " + BASE_PATH + "/");
     LOG.debug("Body of request:\n{}", owner);

@@ -94,6 +94,7 @@ public class HorseEndpoint {
    * @throws ValidationException If validation errors occur
    */
   @PostMapping()
+  @ResponseStatus(HttpStatus.CREATED)
   public HorseDetailDto create(@RequestBody HorseCreateDto toCreate) throws ValidationException, ConflictException, NotFoundException {
     LOG.info("POST " + BASE_PATH + "/");
     LOG.debug("Body of request:\n{}", toCreate);
@@ -102,6 +103,7 @@ public class HorseEndpoint {
   }
 
   @DeleteMapping("{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable long id) {
     LOG.info("DELETE " + BASE_PATH + "/{}", id);
 
