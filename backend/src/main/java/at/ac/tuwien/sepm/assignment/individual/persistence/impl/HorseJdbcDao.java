@@ -56,6 +56,7 @@ public class HorseJdbcDao implements HorseDao {
           + " WHERE id = ? UNION ALL SELECT h.id, h.name, h.father_id, h.mother_id, a.generation + 1"
           + " FROM ancestors a JOIN horse h ON h.id = a.father_id OR h.id = a.mother_id WHERE a.generation < ?)"
           + " SELECT DISTINCT id FROM ancestors);";
+  private static final String SQL_GET_DIRECT_CHILDREN = "SELECT * FROM " + TABLE_NAME + " WHERE father_id = ? OR mother_id = ?";
   private final JdbcTemplate jdbcTemplate;
 
   public HorseJdbcDao(
@@ -215,6 +216,20 @@ public class HorseJdbcDao implements HorseDao {
     }
 
     return ancestors;
+  }
+
+  @Override
+  public boolean isParent(long horseId) {
+    LOG.trace("isParent({})", horseId);
+
+    List<Horse> horses;
+    try {
+      horses = jdbcTemplate.query(SQL_GET_DIRECT_CHILDREN, this::mapRow, horseId, horseId);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
+
+    return !horses.isEmpty();
   }
 
   private Horse mapRow(ResultSet result, int rownum) throws SQLException {

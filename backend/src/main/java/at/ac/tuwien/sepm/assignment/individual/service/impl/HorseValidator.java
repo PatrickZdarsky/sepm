@@ -83,7 +83,7 @@ public class HorseValidator {
    * @throws ValidationException if a parameter is failing validation checks
    * @throws ConflictException if the given constellation of parents is illegal
    */
-  public void validateForUpdate(HorseDetailDto horse, HorseDetailSimpleDto father, HorseDetailSimpleDto mother) throws ValidationException, ConflictException {
+  public void validateForUpdate(HorseDetailDto horse, HorseDetailSimpleDto father, HorseDetailSimpleDto mother, boolean isParent, Sex oldSex) throws ValidationException, ConflictException {
     LOG.trace("validateForUpdate({})", horse);
     List<String> validationErrors = new ArrayList<>();
 
@@ -99,6 +99,10 @@ public class HorseValidator {
 
     List<String> conflictErrors = new ArrayList<>();
     validateParents(conflictErrors, horse.id(), horse.dateOfBirth(), father, mother);
+
+    if (isParent && oldSex != horse.sex()) {
+      conflictErrors.add("Cannot change sex of horse which has children");
+    }
 
     if (!conflictErrors.isEmpty()) {
       throw new ConflictException("Data of horse for update has conflicts", conflictErrors);

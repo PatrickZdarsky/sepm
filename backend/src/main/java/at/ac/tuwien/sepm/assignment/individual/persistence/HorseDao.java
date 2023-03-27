@@ -73,4 +73,12 @@ public interface HorseDao {
    * @throws NotFoundException if the given {@code rootId} doesn't correlate to any horse in the persistent data store
    */
   List<Horse> getAncestors(long rootId, long generations) throws NotFoundException;
+
+  /**
+   * Check if a given horse has children
+   *
+   * @param horseId The id of the horse to check if it is the parent of another horse
+   * @return true, if the given horse has children, false otherwise
+   */
+  boolean isParent(long horseId);
 }
