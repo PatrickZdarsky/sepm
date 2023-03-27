@@ -1,0 +1,46 @@
+<div>
+  <div class="border rounded expanded d-flex flex-row w-auto p-3">
+    <div class="border rounded border-secondary expand-icon btn-expand me-2"
+         role="button"
+         (click)="toggleExpand()">
+      <i class="bi bi-chevron-down px-2"></i>
+    </div>
+    <span>
+      {{horse.name}} <i class="{{sexIconClass()}}"></i>
+    </span>
+    <span style="flex: 1"></span>
+    <div class="d-inline-block me-3">
+      {{formattedBirthday()}}
+    </div>
+    <div class="btn-group">
+      <a class="btn btn-sm responsive-danger-button"
+         aria-label="Delete horse"
+         (click)="delete()">
+        <i class="bi bi-trash"></i>
+      </a>
+      <a class="btn btn-sm responsive-info-button"
+         [routerLink]="['/horses', horse.id]"
+         aria-label="Show horse details">
+        <i class="bi bi-info-lg"></i>
+      </a>
+      <a class="btn btn-sm responsive-warning-button"
+         [routerLink]="['/horses/edit', horse.id]"
+         aria-label="Edit horse">
+        <i class="bi bi-pencil"></i>
+      </a>
+    </div>
+  </div>
+
+  <div class="ps-4">
+    <app-tree-node
+      [hidden]="expanded"
+      *ngIf="horse && horse.mother"
+      [horse]="horse.mother"
+    ></app-tree-node>
+    <app-tree-node
+      [hidden]="expanded"
+      *ngIf="horse && horse.father"
+      [horse]="horse.father"
+    ></app-tree-node>
+  </div>
+</div>

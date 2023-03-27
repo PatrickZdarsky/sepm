@@ -1,0 +1,20 @@
+<h1 class="display-1">Family Tree</h1>
+<form class="d-flex flex-row w-auto mt-4" (submit)="loadTree()">
+  <button class="btn btn-primary me-2" type="submit" aria-label="Load tree">
+    <i class="bi bi-arrow-clockwise"></i>
+    Load
+  </button>
+  <input
+        [(ngModel)]="generations"
+        [ngModelOptions]="{standalone: true}"
+        type="number"
+        min="1"
+        class="form-control w-25">
+</form>
+<div class="my-3">
+  <app-tree-node
+    *ngIf="horseTreeRoot | async as horseTreeRoot"
+    [horse]="horseTreeRoot">
+
+  </app-tree-node>
+</div>

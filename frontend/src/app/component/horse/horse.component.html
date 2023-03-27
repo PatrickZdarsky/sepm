@@ -122,20 +122,25 @@
         <td>{{ownerName(horse.owner)}}</td>
         <td>
           <div class="btn-group">
-            <a class="btn btn-sm responsive-danger-button"
-               aria-label="Delete horse"
-               (click)="delete(horse.id)">
-              <i class="bi bi-trash"></i>
-            </a>
             <a class="btn btn-sm responsive-info-button"
                [routerLink]="['/horses', horse.id]"
                aria-label="Show horse details">
               <i class="bi bi-info-lg"></i>
             </a>
+            <a class="btn btn-sm responsive-tree-button"
+               [routerLink]="['tree', horse.id]"
+               aria-label="Show family tree of horse">
+              <i class="bi bi-list"></i>
+            </a>
             <a class="btn btn-sm responsive-warning-button"
                [routerLink]="['edit', horse.id]"
                aria-label="Edit horse">
               <i class="bi bi-pencil"></i>
+            </a>
+            <a class="btn btn-sm responsive-danger-button"
+               aria-label="Delete horse"
+               (click)="delete(horse.id)">
+              <i class="bi bi-trash"></i>
             </a>
           </div>
         </td>

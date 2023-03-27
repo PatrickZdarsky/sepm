@@ -21,3 +21,12 @@ export interface HorseSearch {
   ownerName?: string;
   limit?: number;
 }
+
+export interface HorseTreeNode {
+  id: number;
+  name: string;
+  dateOfBirth: Date;
+  sex: Sex;
+  mother?: HorseTreeNode;
+  father?: HorseTreeNode;
+}
