@@ -56,5 +56,21 @@ public interface HorseDao {
    */
   void delete(long id) throws NotFoundException;
 
+  /**
+   * Search for horses based on search parameters which are connected using AND Operations
+   *
+   * @param searchFilter The parameters, that the returned horses must match
+   * @return All horses which match the search parameters
+   */
   public List<Horse> search(HorseSearchDto searchFilter);
+
+  /**
+   * Retrieve all ancestors of a horse up to the {@code generations} generation.
+   *
+   * @param rootId The root of the ancestors
+   * @param generations The number of ancestors to retrieve
+   * @return A List with all ancestors of the given horse up to the {@code generations} generation
+   * @throws NotFoundException if the given {@code rootId} doesn't correlate to any horse in the persistent data store
+   */
+  List<Horse> getAncestors(long rootId, long generations) throws NotFoundException;
 }

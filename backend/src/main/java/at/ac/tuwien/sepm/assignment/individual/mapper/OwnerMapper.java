@@ -11,6 +11,12 @@ import org.springframework.stereotype.Component;
 public class OwnerMapper {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+  /**
+   * Map an entity owner to the corresponding dto
+   *
+   * @param owner the entity to map
+   * @return the resulting dto
+   */
   public OwnerDto entityToDto(Owner owner) {
     LOG.trace("entityToDto({})", owner);
     if (owner == null) {

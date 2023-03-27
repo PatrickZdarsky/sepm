@@ -1,9 +1,6 @@
 package at.ac.tuwien.sepm.assignment.individual.rest;
 
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.*;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
@@ -30,6 +27,21 @@ public class HorseEndpoint {
   public HorseEndpoint(HorseService service) {
     this.service = service;
   }
+
+  @GetMapping("{id}/ancestors")
+  public HorseTreeDto getAncestors(@PathVariable Long id, Integer generations) throws ValidationException {
+    LOG.info("GET " + BASE_PATH + "/{}/ancestors", id);
+    LOG.debug("request parameters: generations={}", generations);
+
+    try {
+      return service.getAncestors(id, generations);
+    } catch (NotFoundException e) {
+      HttpStatus status = HttpStatus.NOT_FOUND;
+      logClientError(status, "Horse to get ancestors of not found", e);
+      throw new ResponseStatusException(status, e.getMessage(), e);
+    }
+  }
+
 
   /**
    * Retrieve horses based on a set of search criteria

@@ -19,6 +19,7 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -44,15 +45,17 @@ public class HorseJdbcDao implements HorseDao {
       + "  , father_id = ?"
       + "  , mother_id = ?"
       + " WHERE id = ?";
-
   private static final String SQL_CREATE = "INSERT INTO " + TABLE_NAME
           + " (name, description, date_of_birth, sex, owner_id, father_id, mother_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
   private static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME
           + " WHERE id=?";
-
   private static final String SQL_SEARCH = "SELECT * FROM " + TABLE_NAME + " WHERE 1=1";
-
+  private static final String SQL_GET_ANCESTORS = "SELECT *  FROM horse "
+          + "WHERE id IN (WITH ancestors (id, name, mother_id, father_id, generation) "
+          + "AS (SELECT id, name, father_id, mother_id, 0 AS generation FROM " + TABLE_NAME
+          + " WHERE id = ? UNION ALL SELECT h.id, h.name, h.father_id, h.mother_id, a.generation + 1"
+          + " FROM ancestors a JOIN horse h ON h.id = a.father_id OR h.id = a.mother_id WHERE a.generation < ?)"
+          + " SELECT DISTINCT id FROM ancestors);";
   private final JdbcTemplate jdbcTemplate;
 
   public HorseJdbcDao(
@@ -194,6 +197,24 @@ public class HorseJdbcDao implements HorseDao {
         .setOwnerId(horse.ownerId())
         .setFatherId(horse.fatherId())
         .setMotherId(horse.motherId());
+  }
+
+  @Override
+  public List<Horse> getAncestors(long rootId, long generations) throws NotFoundException {
+    LOG.trace("getAncestors({},{})", rootId, generations);
+
+    List<Horse> ancestors;
+    try {
+      ancestors = jdbcTemplate.query(SQL_GET_ANCESTORS, this::mapRow, rootId, generations);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
+
+    if (ancestors.isEmpty()) {
+      throw new NotFoundException("No horse with ID %d found".formatted(rootId));
+    }
+
+    return ancestors;
   }
 
   private Horse mapRow(ResultSet result, int rownum) throws SQLException {

@@ -134,7 +134,22 @@ public class HorseServiceImpl implements HorseService {
 
   @Override
   public Stream<HorseListDto> search(HorseSearchDto searchParameters) {
+    LOG.trace("search({})", searchParameters);
+
     return dao.search(searchParameters).stream().map(horse -> mapper.entityToListDto(horse, ownerMapForSingleId(horse.getOwnerId())));
+  }
+
+  @Override
+  public HorseTreeDto getAncestors(Long id, Integer generations) throws NotFoundException, ValidationException {
+    LOG.trace("getAncestors({}, {})", id, generations);
+
+    validator.validateForAncestorRetrieval(id, generations);
+
+    var horses = dao.getAncestors(id, generations);
+    var root = horses.stream().filter(horse -> horse.getId() == id).findAny()
+            .orElseThrow(() -> new FatalException("Horse ancestors are missing horse itself"));
+
+    return mapper.entityListToTreeDto(root, horses);
   }
 
 

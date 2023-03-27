@@ -20,6 +20,39 @@ import org.springframework.stereotype.Component;
 public class HorseValidator {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+  /**
+   * Validate parameters for horse ancestor retrieval
+   *
+   * @param id the root horse
+   * @param generations the max generation hops, has to be bigger than 0
+   * @throws ValidationException if a parameter is failing validation checks
+   */
+  public void validateForAncestorRetrieval(Long id, Integer generations) throws ValidationException {
+    LOG.trace("validateForAncestorRetrieval({}, {})", id, generations);
+
+    List<String> validationErrors = new ArrayList<>();
+    validateId(validationErrors, id);
+
+    if (generations == null) {
+      validationErrors.add("Ancestor generations are missing");
+    } else if (generations < 0) {
+      validationErrors.add("Ancestor generations must be positive");
+    }
+
+    if (!validationErrors.isEmpty()) {
+      throw new ValidationException("Validation of ancestor retrieval failed", validationErrors);
+    }
+  }
+
+  /**
+   * Validate parameters to create new horse
+   *
+   * @param horse The horse to be created
+   * @param father existing horse which should be set as father
+   * @param mother existing horse which should be set as mother
+   * @throws ValidationException if a parameter is failing validation checks
+   * @throws ConflictException if the given constellation of parents is illegal
+   */
   public void validateForCreate(HorseCreateDto horse, HorseDetailSimpleDto father, HorseDetailSimpleDto mother) throws ValidationException, ConflictException {
     LOG.trace("validateForCreate({})", horse);
     List<String> validationErrors = new ArrayList<>();
@@ -41,6 +74,15 @@ public class HorseValidator {
     }
   }
 
+  /**
+   * Validate parameters to update an existing horse
+   *
+   * @param horse existing horse with new values to be updated
+   * @param father existing horse which should be set as father
+   * @param mother existing horse which should be set as mother
+   * @throws ValidationException if a parameter is failing validation checks
+   * @throws ConflictException if the given constellation of parents is illegal
+   */
   public void validateForUpdate(HorseDetailDto horse, HorseDetailSimpleDto father, HorseDetailSimpleDto mother) throws ValidationException, ConflictException {
     LOG.trace("validateForUpdate({})", horse);
     List<String> validationErrors = new ArrayList<>();

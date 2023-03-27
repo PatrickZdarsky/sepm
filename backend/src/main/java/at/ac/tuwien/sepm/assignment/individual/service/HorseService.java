@@ -1,9 +1,6 @@
 package at.ac.tuwien.sepm.assignment.individual.service;
 
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.*;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
@@ -70,4 +67,16 @@ public interface HorseService {
    * @return All horses which match the search parameters
    */
   Stream<HorseListDto> search(HorseSearchDto searchParameters);
+
+  /**
+   * Retrieve all ancestors for the given horse. The horse itself is part of generation 0,
+   * the parents generation 1 and so on.
+   *
+   * @param id the id of the horse of which we want to receive the ancestor tree
+   * @param generations the number of generations to be included in the tree (>0)
+   * @return All ancestors of the given horse including the horse itself at the root, up to {@code generations} depth
+   * @throws NotFoundException If no horse with the given id was found
+   * @throws ValidationException If the given parameters fail validation checks for constraints
+   */
+  HorseTreeDto getAncestors(Long id, Integer generations) throws NotFoundException, ValidationException;
 }
