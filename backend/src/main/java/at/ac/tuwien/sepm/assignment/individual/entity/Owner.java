@@ -1,5 +1,8 @@
 package at.ac.tuwien.sepm.assignment.individual.entity;
 
+/**
+ * Represents an owner in the persistent data store.
+ */
 public class Owner {
   private long id;
   private String firstName;

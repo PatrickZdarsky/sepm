@@ -28,6 +28,14 @@ public class HorseEndpoint {
     this.service = service;
   }
 
+  /**
+   * Retrieve the ancestor tree of a given horse
+   *
+   * @param id the id of the horse to retrieve the generation tree from
+   * @param generations the amount of generations to be contained in the tree. The horse itself is generation 0, their parents 1 and so on
+   * @return A ancestor tree with the given horse at the root of it
+   * @throws ValidationException If validation errors occur
+   */
   @GetMapping("{id}/ancestors")
   public HorseTreeDto getAncestors(@PathVariable Long id, Integer generations) throws ValidationException {
     LOG.info("GET " + BASE_PATH + "/{}/ancestors", id);
@@ -114,6 +122,11 @@ public class HorseEndpoint {
     return service.create(toCreate);
   }
 
+  /**
+   * Delete a horse
+   *
+   * @param id the id of the horse to delete
+   */
   @DeleteMapping("{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable long id) {

@@ -25,12 +25,26 @@ public class OwnerEndpoint {
     this.service = service;
   }
 
+  /**
+   * Search for owners based on the given parameters
+   *
+   * @param searchParameters the search parameters to search for
+   * @return all owners which math the given search parameters
+   */
   @GetMapping
   public Stream<OwnerDto> search(OwnerSearchDto searchParameters) {
     LOG.info("GET " + BASE_PATH + " query parameters: {}", searchParameters);
     return service.search(searchParameters);
   }
 
+  /**
+   * Create a new owner
+   *
+   * @param owner the new owner to create
+   * @return the created owner as it has been saved in the persistent data store
+   * @throws ValidationException if validation errors occur
+   * @throws ConflictException if the given owner has conflicts with existing entities
+   */
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public OwnerDto create(@RequestBody OwnerCreateDto owner) throws ValidationException, ConflictException {
