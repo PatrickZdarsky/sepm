@@ -12,10 +12,10 @@ import {AutocompleteComponent} from './component/autocomplete/autocomplete.compo
 import {HeaderComponent} from './component/header/header.component';
 import {HorseCreateEditComponent} from './component/horse/horse-create-edit/horse-create-edit.component';
 import {HorseComponent} from './component/horse/horse.component';
-import {OwnerComponent} from "./component/owner/owner.component";
-import {OwnerCreateComponent} from "./component/owner/owner-create/owner-create.component";
-import { HorseTreeComponent } from './component/horse/horse-tree/horse-tree.component';
-import { TreeNodeComponent } from './component/horse/horse-tree/tree-node/tree-node.component';
+import {OwnerComponent} from './component/owner/owner.component';
+import {OwnerCreateComponent} from './component/owner/owner-create/owner-create.component';
+import {HorseTreeComponent} from './component/horse/horse-tree/horse-tree.component';
+import {TreeNodeComponent} from './component/horse/horse-tree/tree-node/tree-node.component';
 
 @NgModule({
   declarations: [
